@@ -18,26 +18,46 @@ class MoviesController < ApplicationController
     if not session.has_key?(:ratings)
       session[:ratings] = @all_ratings
     end
-    sort_key = params[:sort]
+    if not session.has_key?(:sort)
+      session[:sort] = nil
+    end
+    
+    restful = params.has_key?(:sort) && params.has_key?(:ratings)
+    logger.debug(restful)
+    
+    # import params
+    if params.has_key?(:sort)
+      session[:sort] = params[:sort]
+    end
     if params.has_key?(:ratings)
       session[:ratings] = params[:ratings].keys
     end
+    
+    # update params and generate haml requirements
+    @style = {}
+    if session[:sort] == nil
+      @movies = Movie.with_ratings(session[:ratings])
+    else
+      @style[session[:sort].to_sym] = "hilite"
+      @movies = Movie.with_ratings(session[:ratings]).order(session[:sort])
+    end
+    params[:sort] = session[:sort]
+    
     @ratings = {}
+    params[:ratings] = {}
     @all_ratings.each do |rating|
       if session[:ratings].include?(rating)
+        params[:ratings][rating] = 1
         @ratings[rating] = true
       else
         @ratings[rating] = false
       end
     end
-    @style = {}
-    if sort_key == nil
-      @movies = Movie.with_ratings(session[:ratings])
-    else
-      @style[sort_key.to_sym] = "hilite"
-      @movies = Movie.with_ratings(session[:ratings]).order(sort_key)
+    
+    if(!restful)
+      flash.keep
+      redirect_to movies_path(params)
     end
-    #redirect_to movies_path(params)
   end
 
   def new
