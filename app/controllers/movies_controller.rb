@@ -13,9 +13,23 @@ class MoviesController < ApplicationController
   def index
     logger.debug(params)
     sort_key = params[:sort]
+    @all_ratings = Movie.all_ratings
+    if params.has_key?(:ratings)
+      selected_ratings = params[:ratings].keys
+    else
+      selected_ratings = @all_ratings
+    end
+    @ratings = {}
+    @all_ratings.each do |rating|
+      if selected_ratings.include?(rating)
+        @ratings[rating] = true
+      else
+        @ratings[rating] = false
+      end
+    end
     @style = {}
     if sort_key == nil
-      @movies = Movie.all
+      @movies = Movie.with_ratings(selected_ratings)
     else
       @style[sort_key.to_sym] = "hilite"
       @movies = Movie.order(sort_key)
