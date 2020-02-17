@@ -11,7 +11,16 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @movies = Movie.all
+    format = params[:format]
+    logger.debug(format)
+    @style = {}
+    if format == nil
+      @movies = Movie.all
+    else
+      @style[format.to_sym] = "hilite"
+      logger.debug(@style)
+      @movies = Movie.order(format)
+    end
   end
 
   def new
@@ -41,5 +50,5 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
-
+  
 end

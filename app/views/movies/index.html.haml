@@ -1,12 +1,12 @@
 -#  This file is app/views/movies/index.html.haml
-%h2 All Movies Test
+%h2 All Movies
 
 %table#movies.table.table-striped.col-md-12
   %thead
     %tr
-      %th Movie Title
+      %th{class: @style[:title]}= link_to "Movie Title", movies_path(:title), id: :title_header
       %th Rating
-      %th Release Date
+      %th{class: @style[:release_date]}= link_to "Release Date", movies_path(:release_date), id: :release_date_header
       %th More Info
   %tbody
     - @movies.each do |movie|
