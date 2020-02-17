@@ -22,8 +22,7 @@ class MoviesController < ApplicationController
       session[:sort] = nil
     end
     
-    restful = params.has_key?(:sort) && params.has_key?(:ratings)
-    logger.debug(restful)
+    restful = (params.has_key?(:sort) || session[:sort] == nil) && params.has_key?(:ratings)
     
     # import params
     if params.has_key?(:sort)
