@@ -11,15 +11,14 @@ class MoviesController < ApplicationController
   end
 
   def index
-    format = params[:format]
-    logger.debug(format)
+    logger.debug(params)
+    sort_key = params[:sort]
     @style = {}
-    if format == nil
+    if sort_key == nil
       @movies = Movie.all
     else
-      @style[format.to_sym] = "hilite"
-      logger.debug(@style)
-      @movies = Movie.order(format)
+      @style[sort_key.to_sym] = "hilite"
+      @movies = Movie.order(sort_key)
     end
   end
 
