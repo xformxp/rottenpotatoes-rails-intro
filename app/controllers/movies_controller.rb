@@ -11,17 +11,20 @@ class MoviesController < ApplicationController
   end
 
   def index
-    logger.debug(params)
-    sort_key = params[:sort]
+    logger.debug(session.to_hash)
     @all_ratings = Movie.all_ratings
+    
+    # initialize session
+    if not session.has_key?(:ratings)
+      session[:ratings] = @all_ratings
+    end
+    sort_key = params[:sort]
     if params.has_key?(:ratings)
-      selected_ratings = params[:ratings].keys
-    else
-      selected_ratings = @all_ratings
+      session[:ratings] = params[:ratings].keys
     end
     @ratings = {}
     @all_ratings.each do |rating|
-      if selected_ratings.include?(rating)
+      if session[:ratings].include?(rating)
         @ratings[rating] = true
       else
         @ratings[rating] = false
@@ -29,11 +32,12 @@ class MoviesController < ApplicationController
     end
     @style = {}
     if sort_key == nil
-      @movies = Movie.with_ratings(selected_ratings)
+      @movies = Movie.with_ratings(session[:ratings])
     else
       @style[sort_key.to_sym] = "hilite"
-      @movies = Movie.order(sort_key)
+      @movies = Movie.with_ratings(session[:ratings]).order(sort_key)
     end
+    #redirect_to movies_path(params)
   end
 
   def new
